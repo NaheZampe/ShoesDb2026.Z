@@ -13,7 +13,7 @@ namespace ShoesDb2026.Services.Interfaces
         Result<ShoesListDto> GetById(int id);
         Result<ShoesEditDto> GetForUpdate(int id);
 
-        Result<ShoesDetailsDto> GetBrandDetails(int id);
+        Result<ShoesDetailsDto> GetShoeDetails(int id);
         Result Add(ShoesCreateDto shoeDto);
         Result Update(ShoesEditDto shoeDto);
         Result Delete(int id);

@@ -3,6 +3,7 @@ using ShoesDb2026.Data;
 using ShoesDb2026.Entities;
 using ShoesDb2026.Services.Common;
 using ShoesDb2026.Services.DTOs.Brand;
+using ShoesDb2026.Services.DTOs.Shoe;
 using ShoesDb2026.Services.Interfaces;
 using ShoesDb2026.Services.Mappers;
 using System;
@@ -83,8 +84,41 @@ namespace ShoesDb2026.Services.Services
 
         public Result<BrandDetailsDto> GetBrandDetails(int id)
         {
-            throw new NotImplementedException();
+            var query = _unitOfWork.Brands.Query()
+                .Where(b => b.BrandId == id)
+                .Select(b => new BrandDetailsDto
+                {
+                    BrandId = b.BrandId,
+                    Name = b.Name,
+                    Active = b.Active,
+                    Shoes = b.Shoes!.Select(s => new ShoesListDto
+                    {
+                        ShoeId = s.ShoeId,
+                        Model = s.Model,
+                        Price = s.Price
+                    }).ToList()
+                }).FirstOrDefault();
+            if (query == null)
+            {
+                return Result<BrandDetailsDto>.Failure("Brand not found");
+            }
+            return Result<BrandDetailsDto>.Success(query);
         }
+
+        //public Result<BrandListDto> GetById(int id)
+        //{
+        //                        Title = b.Title,
+        //                        PublisherName = b.Publisher.Name,
+        //                        Price = b.Price,
+        //                        Stock = b.Stock,
+        //                    }).ToList()
+        //        }).FirstOrDefault();
+        //    if (query == null)
+        //    {
+        //        return Result<AuthorDetailsDto>.Failure("Author not found");
+        //    }
+        //    return Result<AuthorDetailsDto>.Success(query);
+        //}
 
         public Result<BrandListDto> GetById(int id)
         {

@@ -4,6 +4,7 @@ using ShoesDb2026.Entities;
 using ShoesDb2026.Services.Common;
 using ShoesDb2026.Services.DTOs.Brand;
 using ShoesDb2026.Services.DTOs.Genre;
+using ShoesDb2026.Services.DTOs.Shoe;
 using ShoesDb2026.Services.Interfaces;
 using ShoesDb2026.Services.Mappers;
 
@@ -102,7 +103,25 @@ namespace ShoesDb2026.Services.Services
 
         public Result<GenreDetailsDto> GetGenreDetails(int id)
         {
-            throw new NotImplementedException();
+            var query = _unitOfWork.Genres.Query()
+               .Where(g => g.GenreId == id)
+               .Select(g => new GenreDetailsDto
+               {
+                   GenreId = g.GenreId,
+                   GenreName = g.GenreName,
+                   Active = g.Active,
+                   Shoes = g.Shoes!.Select(s => new ShoesListDto
+                   {
+                       ShoeId = s.ShoeId,
+                       Model = s.Model,
+                       Price = s.Price
+                   }).ToList()
+               }).FirstOrDefault();
+            if (query == null)
+            {
+                return Result<GenreDetailsDto>.Failure("Genre not found");
+            }
+            return Result<GenreDetailsDto>.Success(query);
         }
 
         public Result Update(GenreEditDto genreDto)

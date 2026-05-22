@@ -76,19 +76,20 @@ namespace ShoesDb2026.Services.Services
                 ShoeId = s.ShoeId,
                 Price = s.Price,
                 Active = s.Active,
-                BrandName = s.Brand!.Name,
-                Size = s.Size!.SizeNumber,
-                SportName = s.Sport!.SportName,
-                GenreName = s.Genre!.GenreName,
-                Description = s.Description
+                BrandName=s.Brand != null ? s.Brand.Name : string.Empty,
 
             }).ToList();
             return Result<List<ShoesListDto>>.Success(shoe);
         }
 
-        public Result<ShoesDetailsDto> GetBrandDetails(int id)
+        public Result<ShoesDetailsDto> GetShoeDetails(int id)
         {
-            throw new NotImplementedException();
+            var shoe = _unitOfWork.SportShoe.GetById(id);
+            if (shoe is null)
+            {
+                return Result<ShoesDetailsDto>.Failure("Shoe not found");
+            }
+            return Result<ShoesDetailsDto>.Success(ShoeMapper.ToShoesDetailsDto(shoe));
         }
 
         public Result<ShoesListDto> GetById(int id)

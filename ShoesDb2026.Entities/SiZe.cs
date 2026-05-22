@@ -9,5 +9,6 @@ namespace ShoesDb2026.Entities
         public int SizeId { get; set; }
         public decimal SizeNumber { get; set; }
         public bool Active { get; set; }
+        public ICollection<SportShoe>? Shoes { get; set; }
     }
 }

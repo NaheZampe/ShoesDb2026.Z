@@ -9,5 +9,6 @@ namespace ShoesDb2026.Entities
         public int SportId { get; set; }
         public string SportName { get; set; } = null!;
         public bool Active { get; set; }
+        public ICollection<SportShoe>? Shoes { get; set; }
     }
 }

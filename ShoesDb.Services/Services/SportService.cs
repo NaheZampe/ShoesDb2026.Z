@@ -2,7 +2,9 @@
 using ShoesDb2026.Data;
 using ShoesDb2026.Entities;
 using ShoesDb2026.Services.Common;
+using ShoesDb2026.Services.DTOs.Brand;
 using ShoesDb2026.Services.DTOs.Genre;
+using ShoesDb2026.Services.DTOs.Shoe;
 using ShoesDb2026.Services.DTOs.Sport;
 using ShoesDb2026.Services.Interfaces;
 using ShoesDb2026.Services.Mappers;
@@ -105,7 +107,25 @@ namespace ShoesDb2026.Services.Services
 
         public Result<SportDetailsDto> GetSportDetails(int id)
         {
-            throw new NotImplementedException();
+            var query = _unitOfWork.Sports.Query()
+               .Where(s => s.SportId == id)
+               .Select(s => new SportDetailsDto
+               {
+                   SportId = s.SportId,
+                   SportName = s.SportName,
+                   Active = s.Active,
+                   Shoes = s.Shoes!.Select(s => new ShoesListDto
+                   {
+                       ShoeId = s.ShoeId,
+                       Model = s.Model,
+                       Price = s.Price
+                   }).ToList()
+               }).FirstOrDefault();
+            if (query == null)
+            {
+                return Result<SportDetailsDto>.Failure("Sport not found");
+            }
+            return Result<SportDetailsDto>.Success(query);
         }
 
         public Result Update(SportEditDto sportDto)

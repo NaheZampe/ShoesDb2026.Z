@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ShoesDb2026.Services.DTOs.Shoe;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -9,6 +10,6 @@ namespace ShoesDb2026.Services.DTOs.Sport
         public int SportId { get; set; }
         public string SportName { get; set; } = null!;
         public bool Active { get; set; }
-        //public List<ShoesListDto> Shoes { get; set; } = new List<ShoesListDto>();
+        public List<ShoesListDto> Shoes { get; set; } = new List<ShoesListDto>();
     }
 }

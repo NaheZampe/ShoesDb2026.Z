@@ -27,15 +27,15 @@ namespace ShoesDb2026.Services.Mappers
         {
             return new ShoesDetailsDto
             {
-                ShoesId = shoe.ShoeId,
+                ShoeId = shoe.ShoeId,
                 Model = shoe.Model,
                 Price = shoe.Price,
                 Description = shoe.Description,
                 Active = shoe.Active,
-                BrandId = shoe.BrandId,
-                SizeId = shoe.SizeId,
-                SportId = shoe.SportId,
-                GenreId = shoe.GenreId
+                BrandName = shoe.Brand != null ? shoe.Brand.Name : string.Empty,
+                Size = shoe.Size != null ? shoe.Size.SizeNumber : 0,
+                SportName = shoe.Sport != null ? shoe.Sport.SportName : string.Empty,
+                GenreName = shoe.Genre != null ? shoe.Genre.GenreName : string.Empty
             };
         }
         public static SportShoe ToSportShoe(ShoesCreateDto shoeCreateDto)
@@ -74,12 +74,8 @@ namespace ShoesDb2026.Services.Mappers
                 ShoeId = shoe.ShoeId,
                 Model = shoe.Model,
                 Price = shoe.Price,
-                Description = shoe.Description,
                 Active = shoe.Active,
-                BrandName = shoe.Brand != null ? shoe.Brand.Name : string.Empty,
-                Size = shoe.Size != null ? shoe.Size.SizeNumber : 0,
-                SportName = shoe.Sport != null ? shoe.Sport.SportName : string.Empty,
-                GenreName = shoe.Genre != null ? shoe.Genre.GenreName : string.Empty
+                BrandName = shoe.Brand != null ? shoe.Brand.Name : string.Empty
             };
         }
     }

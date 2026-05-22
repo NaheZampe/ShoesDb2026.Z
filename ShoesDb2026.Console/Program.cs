@@ -59,6 +59,7 @@ internal class Program
                 Console.WriteLine("2. Add");
                 Console.WriteLine("3. Edit");
                 Console.WriteLine("4. Delete");
+                Console.WriteLine("5. Details");
                 Console.WriteLine("0. Back");
                 Console.Write("Select an option: ");
 
@@ -68,6 +69,7 @@ internal class Program
                     case "2": AddBrand(services); break;
                     case "3": EditBrand(services); break;
                     case "4": DeleteBrand(services); break;
+                    case "5": DetailsBrand(services); break;
                     case "0": back = true; break;
                     default:
                         Console.WriteLine("Invalid option. Press any key...");
@@ -76,6 +78,36 @@ internal class Program
                 }
             } 
         }
+    }
+
+    private static void DetailsBrand(IBrandService services)
+    {
+        Console.Clear();
+        Console.WriteLine("======== Brand Details ========");
+        ShowBrands(services);
+        Console.Write("Select an ID to view details: ");
+
+        var brandId = int.Parse(Console.ReadLine()!);
+
+        var brandResult = services.GetBrandDetails(brandId);
+        if (brandResult.IsFailure)
+        {
+            ShowErrors(brandResult.Errors);
+            return;
+        }
+
+        var brand = brandResult.Value;
+        Console.WriteLine($"Id: {brand!.BrandId}");
+        Console.WriteLine($"Name: {brand.Name}"); 
+        Console.WriteLine($"Active: {brand.Active}");
+        Console.WriteLine("============================================================================================");
+        foreach (var shoe in brand.Shoes)
+        {
+            Console.WriteLine($"Id: {shoe.ShoeId,2} || Model: {shoe.Model,-10} || Price: {shoe.Price,10:C} || Active: {(shoe.Active ? "Yes" : "No")} || Brand: {shoe.BrandName,-5}");
+            Console.WriteLine("============================================================================================");
+        }
+
+        Console.ReadKey();
     }
 
     private static void ShowAllBrands(IBrandService services) 
@@ -235,6 +267,7 @@ internal class Program
                 Console.WriteLine("2. Add");
                 Console.WriteLine("3. Edit");
                 Console.WriteLine("4. Delete");
+                Console.WriteLine("5. Details");
                 Console.WriteLine("0. Back");
                 Console.Write("Select an option: ");
 
@@ -244,6 +277,7 @@ internal class Program
                     case "2": AddGenre(service); break;
                     case "3": EditGenre(service); break;
                     case "4": DeleteGenre(service); break;
+                    case "5": DetailsGenre(service); break;
                     case "0": back = true; break;
                     default:
                         Console.WriteLine("Invalid option. Press any key...");
@@ -252,6 +286,36 @@ internal class Program
                 }
             } 
         }
+    }
+
+    private static void DetailsGenre(IGenreService service)
+    {
+        Console.Clear();
+        Console.WriteLine("======== Genre Details ========");
+        ShowGenres(service);
+        Console.Write("Select an ID to view details: ");
+
+        var genreId = int.Parse(Console.ReadLine()!);
+
+        var genreResult = service.GetGenreDetails(genreId);
+        if (genreResult.IsFailure)
+        {
+            ShowErrors(genreResult.Errors);
+            return;
+        }
+
+        var genre = genreResult.Value;
+        Console.WriteLine($"Id: {genre!.GenreId}");
+        Console.WriteLine($"Name: {genre.GenreName}");
+        Console.WriteLine($"Active: {genre.Active}");
+        Console.WriteLine("============================================================================================");
+        foreach (var shoe in genre.Shoes)
+        {
+            Console.WriteLine($"Id: {shoe.ShoeId,2} || Model: {shoe.Model,-10} || Price: {shoe.Price,10:C} || Active: {(shoe.Active ? "Yes" : "No")} || Brand: {shoe.BrandName,-5}");
+            Console.WriteLine("============================================================================================");
+        }
+
+        Console.ReadKey();
     }
 
     private static void ShowAllGenres(IGenreService service) 
@@ -518,6 +582,7 @@ internal class Program
                 Console.WriteLine("2. Add");
                 Console.WriteLine("3. Edit");
                 Console.WriteLine("4. Delete");
+                Console.WriteLine("5. Details");
                 Console.WriteLine("0. Back");
                 Console.Write("Select an option: ");
 
@@ -527,6 +592,7 @@ internal class Program
                     case "2": AddSport(service); break;
                     case "3": EditSport(service); break;
                     case "4": DeleteSport(service); break;
+                    case "5": DetailsSport(service); break;
                     case "0": back = true; break;
                     default:
                         Console.WriteLine("Invalid option. Press any key...");
@@ -536,6 +602,37 @@ internal class Program
             } 
         }
     }
+
+    private static void DetailsSport(ISportService service)
+    {
+        Console.Clear();
+        Console.WriteLine("======== Sport Details ========");
+        ShowSports(service);
+        Console.Write("Select an ID to view details: ");
+
+        var sportId = int.Parse(Console.ReadLine()!);
+
+        var sportResult = service.GetSportDetails(sportId);
+        if (sportResult.IsFailure)
+        {
+            ShowErrors(sportResult.Errors);
+            return;
+        }
+
+        var sport = sportResult.Value;
+        Console.WriteLine($"Id: {sport!.SportId}");
+        Console.WriteLine($"Name: {sport.SportName}");
+        Console.WriteLine($"Active: {sport.Active}");
+        Console.WriteLine("============================================================================================");
+        foreach (var shoe in sport.Shoes)
+        {
+            Console.WriteLine($"Id: {shoe.ShoeId,2} || Model: {shoe.Model,-10} || Price: {shoe.Price,10:C} || Active: {(shoe.Active ? "Yes" : "No")} || Brand: {shoe.BrandName,-5}");
+            Console.WriteLine("============================================================================================");
+        }
+
+        Console.ReadKey();
+    }
+
     private static void ShowAllSports(ISportService service)
     {
         Console.Clear();
@@ -697,6 +794,7 @@ internal class Program
                 Console.WriteLine("2. Add");
                 Console.WriteLine("3. Edit");
                 Console.WriteLine("4. Delete");
+                Console.WriteLine("5. Details");
                 Console.WriteLine("0. Back");
                 Console.Write("Select an option: ");
 
@@ -706,6 +804,7 @@ internal class Program
                     case "2": AddSportShoe(serviceShoe, serviceBrand, serviceGenre, serviceSport, serviceSize); break;
                     case "3": EditSportShoe(serviceShoe, serviceBrand, serviceGenre, serviceSport, serviceSize); break;
                     case "4": DeleteSportShoe(serviceShoe); break;
+                    case "5": DetailsSportShoe(serviceShoe); break;
                     case "0": back = true; break;
                     default:
                         Console.WriteLine("Invalid option. Press any key...");
@@ -715,6 +814,38 @@ internal class Program
             } 
         }
     }
+
+    private static void DetailsSportShoe(ISportShoeService serviceShoe)
+    {
+        Console.Clear();
+        Console.WriteLine("======== Shoe Details ========");
+        ShowShoes(serviceShoe);
+        Console.Write("Select an ID to view details: ");
+
+        var shoeId = int.Parse(Console.ReadLine()!);
+
+        var shoeResult = serviceShoe.GetShoeDetails(shoeId);
+        if (shoeResult.IsFailure)
+        {
+            ShowErrors(shoeResult.Errors);
+            return;
+        }
+
+        var shoe = shoeResult.Value;
+        Console.WriteLine($"Id: {shoe!.ShoeId}");
+        Console.WriteLine($"Model: {shoe.Model}");
+        Console.WriteLine($"Price: {shoe.Price}");
+        Console.WriteLine($"Active: {shoe.Active}");
+        Console.WriteLine($"Brand: {shoe.BrandName}");
+        Console.WriteLine($"Size: {shoe.Size}");
+        Console.WriteLine($"Sport: {shoe.SportName}");
+        Console.WriteLine($"Genre: {shoe.GenreName}");
+
+
+        Console.ReadKey();
+    }
+
+    
 
     private static void ShowAllSportShoes(ISportShoeService serviceShoe) 
     {
@@ -736,7 +867,7 @@ internal class Program
         foreach (var shoe in shoes!)
         {
             Console.WriteLine($"Id: {shoe.ShoeId,2} || Model: {shoe.Model,-10} || Price: {shoe.Price,10:C} || Active: {(shoe.Active ? "Yes" : "No")} || Brand: {shoe.BrandName,-5}");
-            Console.WriteLine("=============================================================================");
+            Console.WriteLine("============================================================================================");
         }
     }
 
