@@ -23,7 +23,8 @@ namespace ShoesDb2026.Services.Mappers
             {
                 BrandId = brand.BrandId,
                 Name = brand.Name,
-                Active = brand.Active
+                Active = brand.Active,
+                RowVersion= brand.RowVersion,
             };
         }
         public static BrandDetailsDto ToBrandDetailsDto(Brand brand)
@@ -49,7 +50,8 @@ namespace ShoesDb2026.Services.Mappers
             {
                 BrandId = brandDto.BrandId,
                 Name = brandDto.Name,
-                Active = brandDto.Active
+                Active = brandDto.Active,
+                RowVersion = brandDto.RowVersion,
             };
         }
     }

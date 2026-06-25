@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using ShoesDb2026.Data.Interfaces;
+﻿using ShoesDb2026.Data.Interfaces;
 using ShoesDb2026.Entities;
 using System;
 using System.Collections.Generic;
@@ -7,33 +6,20 @@ using System.Text;
 
 namespace ShoesDb2026.Data.Repositories
 {
-    public class SizeRepository : ISizeRepository
+    public class SizeRepository : ConcurrentRepository<SiZe>, ISizeRepository
     {
-        private readonly ShoesDbContext _context;
-
-        public SizeRepository(ShoesDbContext context)
+        public SizeRepository(ShoesDbContext context) : base(context)
         {
-            _context = context;
         }
 
-        public bool Exist(decimal number, int? sizeId=null)
+        public bool Exist(SiZe size)
         {
-            return _context.Sizes.Any(s=>s.SizeNumber==number && s.SizeId!=sizeId);
+            throw new NotImplementedException();
         }
 
-        public List<SiZe> GetAll()
+        public bool IsRelated(SiZe size)
         {
-            return _context.Sizes.AsNoTracking().ToList();
-        }
-
-        public SiZe? GetById(int id)
-        {
-            return _context.Sizes.Find(id);
-        }
-
-        public void Update(SiZe size)
-        {
-            _context.Sizes.Update(size);
+            throw new NotImplementedException();
         }
     }
 }

@@ -4,4 +4,5 @@
   <Project Path="ShoesDb2026.Data/ShoesDb2026.Data.csproj" />
   <Project Path="ShoesDb2026.Entities/ShoesDb2026.Entities.csproj" />
   <Project Path="ShoesDb2026.IoC/ShoesDb2026.IoC.csproj" />
+  <Project Path="ShoesDb2026.Windows/ShoesDb2026.Windows.csproj" Id="b5b4951a-bf16-4bc6-aecc-2bccb3eae855" />
 </Solution>

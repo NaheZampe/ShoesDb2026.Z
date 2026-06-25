@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using ShoesDb2026.Data;
 using ShoesDb2026.Entities;
 using ShoesDb2026.Services.Common;
@@ -31,13 +32,13 @@ namespace ShoesDb2026.Services.Services
             {
                 return Result.Failure(result.Errors.Select(e => e.ErrorMessage).ToList());
             }
-            if (_unitOfWork.Sports.ExistSameName(shoe.Model, shoe.ShoeId))
+            if (_unitOfWork.Shoes.Exist(shoe))
             {
                 return Result.Failure("Shoe already exists!!!");
             }
             try
             {
-                _unitOfWork.SportShoe.Add(shoe);
+                _unitOfWork.Shoes.Add(shoe);
                 _unitOfWork.Save();
                 return Result.Success();
             }
@@ -49,7 +50,7 @@ namespace ShoesDb2026.Services.Services
 
         public Result Delete(int id)
         {
-            var result = _unitOfWork.SportShoe.GetById(id);
+            var result = _unitOfWork.Shoes.GetById(id);
             if (result == null)
             {
                 return Result.Failure("Shoe not found!!!");
@@ -57,7 +58,7 @@ namespace ShoesDb2026.Services.Services
 
             try
             {
-                _unitOfWork.SportShoe.Delete(id);
+                _unitOfWork.Shoes.Delete(id);
                 _unitOfWork.Save();
                 return Result.Success();
             }
@@ -70,7 +71,7 @@ namespace ShoesDb2026.Services.Services
 
         public Result<List<ShoesListDto>> GetAll()
         {
-            var shoe = _unitOfWork.SportShoe.GetAll().Select(s => new ShoesListDto
+            var shoe = _unitOfWork.Shoes.GetAll().Select(s => new ShoesListDto
             {
                 Model = s.Model,
                 ShoeId = s.ShoeId,
@@ -84,7 +85,7 @@ namespace ShoesDb2026.Services.Services
 
         public Result<ShoesDetailsDto> GetShoeDetails(int id)
         {
-            var shoe = _unitOfWork.SportShoe.GetById(id);
+            var shoe = _unitOfWork.Shoes.GetById(id);
             if (shoe is null)
             {
                 return Result<ShoesDetailsDto>.Failure("Shoe not found");
@@ -94,7 +95,7 @@ namespace ShoesDb2026.Services.Services
 
         public Result<ShoesListDto> GetById(int id)
         {
-            var shoe = _unitOfWork.SportShoe.GetById(id);
+            var shoe = _unitOfWork.Shoes.GetById(id);
             if (shoe is null)
             {
                 return Result<ShoesListDto>.Failure("Shoe not found!!!");
@@ -104,7 +105,7 @@ namespace ShoesDb2026.Services.Services
 
         public Result<ShoesEditDto> GetForUpdate(int id)
         {
-            var shoe = _unitOfWork.SportShoe.GetById(id);
+            var shoe = _unitOfWork.Shoes.GetById(id);
             if (shoe is null)
             {
                 return Result<ShoesEditDto>.Failure("Shoe not found!!!");
@@ -114,38 +115,51 @@ namespace ShoesDb2026.Services.Services
 
         public Result Update(ShoesEditDto shoeDto)
         {
-            var shoeToValidate = ShoeMapper.ToSportShoe(shoeDto);
-            var result = _validator.Validate(shoeToValidate);
-            if (!result.IsValid)
-            {
-                return Result.Failure(result.Errors.Select(e => e.ErrorMessage).ToList());
-            }
-            var shoeToDb = _unitOfWork.SportShoe.GetById(shoeToValidate.ShoeId);
-            if (shoeToDb is null)
-            {
-                return Result.Failure("Sport not found!!!");
-            }
-            shoeToDb.Model = shoeToValidate.Model;
-            shoeToDb.Price = shoeToValidate.Price;
-            shoeToDb.Description = shoeToValidate.Description;
-            shoeToDb.Active = shoeToValidate.Active;
-            shoeToDb.BrandId = shoeToValidate.BrandId;
-            shoeToDb.SizeId = shoeToValidate.SizeId;
-            shoeToDb.SportId = shoeToValidate.SportId;
-            shoeToDb.GenreId = shoeToValidate.GenreId;
-
-            if (_unitOfWork.SportShoe.ExistSameName(shoeToValidate.Model, shoeToValidate.ShoeId))
-            {
-                return Result.Failure("Shoe already exists!!!");
-            }
             try
             {
+
+                var entidad = ShoeMapper.ToSportShoe(shoeDto);
+
+                var validationResult = _validator.Validate(entidad);
+
+                if (!validationResult.IsValid)
+                {
+                    return Result.Failure(validationResult.Errors.Select(e => e.ErrorMessage)
+                            .ToList());
+                }
+
+                if (_unitOfWork.Shoes.Exist(entidad))
+                {
+                    return Result.Failure(
+                        $" Ya existe un calzado con el nombre {entidad.Model}");
+                }
+
+                _unitOfWork.Shoes.Update(entidad, shoeDto.ShoeId, shoeDto.RowVersion);
+
                 _unitOfWork.Save();
+
                 return Result.Success();
+            }
+            catch (DbUpdateConcurrencyException)//acá decía DBConcurrencyException!!!
+            {
+                _unitOfWork.RollBack();
+
+                return Result.ConcurrencyFailure(
+                    "Otro usuario modificó el registro.\nLa grilla se recargará automáticamente");
+            }
+            catch (KeyNotFoundException)
+            {
+                _unitOfWork.RollBack();
+
+                return Result.Failure(
+                    $"Calzado con ID {shoeDto.ShoeId} no encontrado");
             }
             catch (Exception ex)
             {
-                return Result.Failure(ex.Message);
+                _unitOfWork.RollBack();
+
+                return Result.Failure(
+                    $"Error al intentar editar el calzado: {ex.Message}");
             }
         }
     }

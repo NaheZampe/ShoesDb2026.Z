@@ -5,15 +5,9 @@ using System.Text;
 
 namespace ShoesDb2026.Data.Interfaces
 {
-    public interface ISportRepository
+    public interface ISportRepository : IConcurrentRepository<Sport>
     {
-        List<Sport> GetAll();
-        IQueryable<Sport> Query();
-        Sport? GetById(int id);
-        void Delete(int id);
-        void Update(Sport sport);
-        void Add(Sport sport);
-        bool ExistSameName(string name, int? sportId = null);
-        bool HasShoes(int sportId);
+        bool Exist(Sport sport);
+        bool IsRelated(Sport sport);
     }
 }

@@ -12,7 +12,7 @@ namespace ShoesDb2026.Data
         public DbSet<Sport> Sports { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder
-               .UseSqlServer("Data Source=.; Initial Catalog=ShoesDb2026; Trusted_Connection=true; TrustServerCertificate=true;");
+               .UseSqlServer("Data Source=.; Initial Catalog=ShoesDb2026-New; Trusted_Connection=true; TrustServerCertificate=true;");
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

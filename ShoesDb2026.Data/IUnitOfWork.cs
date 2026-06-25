@@ -1,17 +1,15 @@
 ﻿using ShoesDb2026.Data.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ShoesDb2026.Data
 {
     public interface IUnitOfWork
     {
-        ISizeRepository Sizes { get; }
-        IBrandRepository Brands { get; }
-        IGenreRepository Genres { get; }
-        ISportRepository Sports { get; }
-        ISportShoeRepository SportShoe { get; }
+        public IBrandRepository Brands { get; }
+        public IGenreRepository Genres { get; }
+        public ISportRepository Sports { get; }
+        public IShoeRepository Shoes { get; }
+        public ISizeRepository Sizes { get; }
+        void RollBack();
         void Save();
     }
 }

@@ -1,12 +1,13 @@
 ﻿using ShoesDb2026.Entities;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace ShoesDb2026.Data.Interfaces
 {
-    public interface ISizeRepository
+    public interface ISizeRepository : IConcurrentRepository<SiZe>
     {
-        List<SiZe> GetAll();
-        void Update(SiZe size);
-        SiZe? GetById(int id);
-        bool Exist(decimal number, int? sizeId=null);
+        bool Exist(SiZe size);
+        bool IsRelated(SiZe size);
     }
 }

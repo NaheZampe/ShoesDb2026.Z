@@ -23,7 +23,8 @@ namespace ShoesDb2026.Services.Mappers
             {
                 SportId = sport.SportId,
                 SportName = sport.SportName,
-                Active = sport.Active
+                Active = sport.Active,
+                RowVersion = sport.RowVersion
             };
         }
         public static SportDetailsDto ToSportDetailsDto(Sport sport)
@@ -49,10 +50,9 @@ namespace ShoesDb2026.Services.Mappers
             {
                 SportId = sportDto.SportId,
                 SportName = sportDto.SportName,
-                Active = sportDto.Active
+                Active = sportDto.Active,
+                RowVersion = sportDto.RowVersion
             };
         }
-        
-
     }
 }

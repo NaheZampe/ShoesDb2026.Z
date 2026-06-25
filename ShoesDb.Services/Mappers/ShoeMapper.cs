@@ -20,7 +20,8 @@ namespace ShoesDb2026.Services.Mappers
                 BrandId = shoe.BrandId,
                 SizeId = shoe.SizeId,
                 SportId = shoe.SportId,
-                GenreId = shoe.GenreId
+                GenreId = shoe.GenreId,
+                RowVersion = shoe.RowVersion
             };
         }
         public static ShoesDetailsDto ToShoesDetailsDto(SportShoe shoe)
@@ -64,7 +65,8 @@ namespace ShoesDb2026.Services.Mappers
                 BrandId = shoeEditDto.BrandId,
                 SizeId = shoeEditDto.SizeId,
                 SportId = shoeEditDto.SportId,
-                GenreId = shoeEditDto.GenreId
+                GenreId = shoeEditDto.GenreId,
+                RowVersion = shoeEditDto.RowVersion
             };
         }
         public static ShoesListDto ToShoeListDto(SportShoe shoe)

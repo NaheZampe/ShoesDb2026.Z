@@ -9,5 +9,6 @@ namespace ShoesDb2026.Services.DTOs.Sport
         public int SportId { get; set; }
         public string SportName { get; set; } = null!;
         public bool Active { get; set; }
+        public byte[] RowVersion { get; set; } = null!;
     }
 }

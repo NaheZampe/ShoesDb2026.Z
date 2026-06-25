@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using ShoesDb2026.Data;
 using ShoesDb2026.Entities;
 using ShoesDb2026.Services.Common;
@@ -49,31 +50,50 @@ namespace ShoesDb2026.Services.Services
 
         public Result Update(SizeEditDto editDto)
         {
-            var sizeToValidate = SizeMapper.ToSize(editDto);
-            var result = _validator.Validate(sizeToValidate);
-            if (!result.IsValid)
-            {
-                return Result.Failure(result.Errors.Select(e => e.ErrorMessage).ToList());
-            }
-            SiZe? size = _unitOfWork.Sizes.GetById(editDto.SizeId);
-            if (size==null)
-            {
-                return Result.Failure("Size not found");
-            }
-            size.SizeNumber = editDto.Number;
-            if (_unitOfWork.Sizes.Exist(editDto.Number,editDto.SizeId))
-            {
-                return Result.Failure("Size already exist!!!");
-            }
             try
             {
+                var entidad = SizeMapper.ToEntity(editDto);
+
+                var validationResult = _validator.Validate(entidad);
+
+                if (!validationResult.IsValid)
+                {
+                    return Result.Failure(validationResult.Errors.Select(e => e.ErrorMessage)
+                            .ToList());
+                }
+
+                if (_unitOfWork.Sizes.Exist(entidad))
+                {
+                    return Result.Failure(
+                        $" Ya existe un talle {entidad.SizeNumber}");
+                }
+
+                _unitOfWork.Sizes.Update(entidad, editDto.SizeId, editDto.RowVersion);
+
                 _unitOfWork.Save();
+
                 return Result.Success();
+            }
+            catch (DbUpdateConcurrencyException)//acá decía DBConcurrencyException!!!
+            {
+                _unitOfWork.RollBack();
+
+                return Result.ConcurrencyFailure(
+                    "Otro usuario modificó el registro.\nLa grilla se recargará automáticamente");
+            }
+            catch (KeyNotFoundException)
+            {
+                _unitOfWork.RollBack();
+
+                return Result.Failure(
+                    $"Tamaño con ID {editDto.SizeId} no encontrado");
             }
             catch (Exception ex)
             {
+                _unitOfWork.RollBack();
 
-                return Result.Failure(ex.Message);
+                return Result.Failure(
+                    $"Error al intentar editar el tamaño: {ex.Message}");
             }
         }
     }

@@ -9,5 +9,6 @@ namespace ShoesDb2026.Services.DTOs.Size
         public int SizeId { get; set; }
         public decimal Number { get; set; }
         public bool Active { get; set; }
+        public byte[] RowVersion { get; set; } = null!;
     }
 }

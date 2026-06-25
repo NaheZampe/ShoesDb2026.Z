@@ -24,17 +24,20 @@ namespace ShoesDb2026.Services.Mappers
             {
                 SizeId = size.SizeId,
                 Number = size.SizeNumber,
-                Active = size.Active
+                Active = size.Active,
+                RowVersion = size.RowVersion
             };
         }
-        public static SiZe ToSize(SizeEditDto sizeEditDto)
+        public static SiZe ToEntity(SizeEditDto sizeEditDto)
         {
             return new SiZe
             {
                 SizeId = sizeEditDto.SizeId,
                 SizeNumber = sizeEditDto.Number,
-                Active = sizeEditDto.Active
+                Active = sizeEditDto.Active,
+                RowVersion = sizeEditDto.RowVersion
             };
         }
+
     }
 }

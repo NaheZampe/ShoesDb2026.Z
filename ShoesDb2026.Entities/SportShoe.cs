@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ShoesDb2026.Entities.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Drawing;
@@ -6,7 +7,7 @@ using System.Text;
 
 namespace ShoesDb2026.Entities
 {
-    public class SportShoe
+    public class SportShoe : IConcurrencyEntity
     {
         [Key]
         public int ShoeId { get; set; }
@@ -22,5 +23,6 @@ namespace ShoesDb2026.Entities
         public Sport? Sport { get; set; }
         public Genre? Genre { get; set; }
         public int GenreId { get; set; }
+        public byte[] RowVersion { get; set; } = null!;
     }
 }

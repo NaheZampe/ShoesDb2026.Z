@@ -9,5 +9,6 @@ namespace ShoesDb2026.Services.DTOs.Brand
         public int BrandId { get; set; }
         public string Name { get; set; } = null!;
         public bool Active { get; set; }
+        public byte[] RowVersion { get; set; } = null!;
     }
 }

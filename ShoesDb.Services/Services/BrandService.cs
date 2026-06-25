@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using ShoesDb2026.Data;
 using ShoesDb2026.Entities;
 using ShoesDb2026.Services.Common;
@@ -22,21 +23,21 @@ namespace ShoesDb2026.Services.Services
             _unitOfWork = unitOfWork;
             _validator = validator;
         }
-
+        
         public Result Add(BrandCreateDto brandDto)
-        {
+        { 
             var brand= BrandMapper.ToEntity(brandDto);
             var result = _validator.Validate(brand);
             if (!result.IsValid)
             {
                 return Result.Failure(result.Errors.Select(e => e.ErrorMessage).ToList());
             }
-            if (_unitOfWork.Brands.ExistSameName(brand.Name, brand.BrandId))
+            if (_unitOfWork.Brands.Exist(brand))
             {
                 return Result.Failure("Brand already exists!!!");
             }
             try
-            {
+            { 
                 _unitOfWork.Brands.Add(brand);
                 _unitOfWork.Save();
                 return Result.Success();
@@ -49,19 +50,15 @@ namespace ShoesDb2026.Services.Services
 
         public Result Delete(int id)
         {
-            var result = _unitOfWork.Brands.GetById(id);
-            if (result == null)
+            var brand = _unitOfWork.Brands.GetById(id);
+            if (brand == null)
             {
-                return Result.Failure("Brand not found!!!");
+                return Result.Failure("Brand not found");
             }
-            if (_unitOfWork.Brands.HasShoes(id))
-            {
-                return Result.Failure("Brand has associated Shoes");
-            }
-
+            //verificar si la marca tiene zapatos asociados
             try
             {
-                _unitOfWork.Brands.Delete(id);
+                _unitOfWork.Brands.Delete(brand.BrandId);
                 _unitOfWork.Save();
                 return Result.Success();
             }
@@ -105,20 +102,7 @@ namespace ShoesDb2026.Services.Services
             return Result<BrandDetailsDto>.Success(query);
         }
 
-        //public Result<BrandListDto> GetById(int id)
-        //{
-        //                        Title = b.Title,
-        //                        PublisherName = b.Publisher.Name,
-        //                        Price = b.Price,
-        //                        Stock = b.Stock,
-        //                    }).ToList()
-        //        }).FirstOrDefault();
-        //    if (query == null)
-        //    {
-        //        return Result<AuthorDetailsDto>.Failure("Author not found");
-        //    }
-        //    return Result<AuthorDetailsDto>.Success(query);
-        //}
+
 
         public Result<BrandListDto> GetById(int id)
         {
@@ -142,31 +126,50 @@ namespace ShoesDb2026.Services.Services
 
         public Result Update(BrandEditDto brandDto)
         {
-            var brandToValidate = BrandMapper.ToEntity(brandDto);
-            var result = _validator.Validate(brandToValidate);
-            if (!result.IsValid)
-            {
-                return Result.Failure(result.Errors.Select(e => e.ErrorMessage).ToList());
-            }
-            var brandFromDb = _unitOfWork.Brands.GetById(brandToValidate.BrandId);
-            if (brandFromDb is null)
-            {
-                return Result.Failure("Brand not found!!!");
-            }
-            brandFromDb.Name = brandDto.Name;
-            brandFromDb.Active = brandDto.Active;
-            if (_unitOfWork.Brands.ExistSameName(brandToValidate.Name, brandToValidate.BrandId))
-            {
-                return Result.Failure("Brand already exists!!!");
-            }
             try
             {
+                var entidad = BrandMapper.ToEntity(brandDto);
+
+                var validationResult = _validator.Validate(entidad);
+
+                if (!validationResult.IsValid)
+                {
+                    return Result.Failure(validationResult.Errors.Select(e => e.ErrorMessage)
+                            .ToList());
+                }
+
+                if (_unitOfWork.Brands.Exist(entidad))
+                {
+                    return Result.Failure(
+                        $" Ya existe una marca con el nombre {entidad.Name}");
+                }
+
+                _unitOfWork.Brands.Update(entidad, brandDto.BrandId, brandDto.RowVersion);
+
                 _unitOfWork.Save();
+
                 return Result.Success();
+            }
+            catch (DbUpdateConcurrencyException)//acá decía DBConcurrencyException!!!
+            {
+                _unitOfWork.RollBack();
+
+                return Result.ConcurrencyFailure(
+                    "Otro usuario modificó el registro.\nLa grilla se recargará automáticamente");
+            }
+            catch (KeyNotFoundException)
+            {
+                _unitOfWork.RollBack();
+
+                return Result.Failure(
+                    $"Marca con ID {brandDto.BrandId} no encontrada");
             }
             catch (Exception ex)
             {
-                return  Result.Failure(ex.Message);
+                _unitOfWork.RollBack();
+
+                return Result.Failure(
+                    $"Error al intentar editar el tipo de bombón: {ex.Message}");
             }
         }
     }

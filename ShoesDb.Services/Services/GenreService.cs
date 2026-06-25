@@ -29,7 +29,7 @@ namespace ShoesDb2026.Services.Services
             {
                 return Result.Failure(result.Errors.Select(e => e.ErrorMessage).ToList());
             }
-            if (_unitOfWork.Genres.ExistSameName(genre.GenreName, genre.GenreId))
+            if (_unitOfWork.Genres.Exist(genre))
             {
                 return Result.Failure("Genre already exists!!!");
             }
@@ -52,7 +52,7 @@ namespace ShoesDb2026.Services.Services
             {
                 return Result.Failure("Genre not found!!!");
             }
-            if (_unitOfWork.Genres.HasShoes(id))
+            if (_unitOfWork.Genres.IsRelated(result))
             {
                 return Result.Failure("Genre has associated Shoes");
             }
@@ -139,7 +139,7 @@ namespace ShoesDb2026.Services.Services
             }
             genreFromDb.GenreName = genreDto.GenreName;
             genreFromDb.Active = genreDto.Active;
-            if (_unitOfWork.Genres.ExistSameName(genreToValidate.GenreName, genreToValidate.GenreId))
+            if (_unitOfWork.Genres.Exist(genreToValidate))
             {
                 return Result.Failure("Genre already exists!!!");
             }

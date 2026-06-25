@@ -15,9 +15,8 @@ namespace ShoesDb2026.IoC
 {
     public static class DependencyInyectionContainer
     {
-        public static IServiceProvider Configure()
+        public static IServiceCollection AddAplicationServices(this IServiceCollection services)
         {
-            var services = new ServiceCollection();
             services.AddDbContext<ShoesDbContext>();
 
             services.AddScoped<ISizeRepository, SizeRepository>();
@@ -36,12 +35,13 @@ namespace ShoesDb2026.IoC
             services.AddScoped<ISportService, SportService>();
             services.AddScoped<IValidator<Sport>, SportValidator>();
 
-            services.AddScoped<ISportShoeRepository, SportShoeRepository>();
+            services.AddScoped<IShoeRepository, ShoeRepository>();
             services.AddScoped<ISportShoeService, SportShoeService>();
             services.AddScoped<IValidator<SportShoe>, ShoeValidator>();
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
-            return services.BuildServiceProvider();
+
+            return services;
         }
     }
 }

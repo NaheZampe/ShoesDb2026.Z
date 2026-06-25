@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using ShoesDb2026.Data;
 using ShoesDb2026.Entities;
 using ShoesDb2026.Services.Common;
@@ -33,7 +34,7 @@ namespace ShoesDb2026.Services.Services
             {
                 return Result.Failure(result.Errors.Select(e => e.ErrorMessage).ToList());
             }
-            if (_unitOfWork.Sports.ExistSameName(sport.SportName, sport.SportId))
+            if (_unitOfWork.Sports.Exist(sport))
             {
                 return Result.Failure("Sport already exists!!!");
             }
@@ -56,7 +57,7 @@ namespace ShoesDb2026.Services.Services
             {
                 return Result.Failure("Sport not found!!!");
             }
-            if (_unitOfWork.Sports.HasShoes(id))
+            if (_unitOfWork.Sports.IsRelated(result))
             {
                 return Result.Failure("Sport has associated Shoes");
             }
@@ -130,31 +131,50 @@ namespace ShoesDb2026.Services.Services
 
         public Result Update(SportEditDto sportDto)
         {
-            var sportToValidate = SportMapper.ToEntity(sportDto);
-            var result = _validator.Validate(sportToValidate);
-            if (!result.IsValid)
-            {
-                return Result.Failure(result.Errors.Select(e => e.ErrorMessage).ToList());
-            }
-            var sportToDb = _unitOfWork.Sports.GetById(sportToValidate.SportId);
-            if (sportToDb is null)
-            {
-                return Result.Failure("Sport not found!!!");
-            }
-            sportToDb.SportName = sportDto.SportName;
-            sportToDb.Active = sportDto.Active;
-            if (_unitOfWork.Sports.ExistSameName(sportToValidate.SportName, sportToValidate.SportId))
-            {
-                return Result.Failure("Sport already exists!!!");
-            }
             try
             {
+                var entidad = SportMapper.ToEntity(sportDto);
+
+                var validationResult = _validator.Validate(entidad);
+
+                if (!validationResult.IsValid)
+                {
+                    return Result.Failure(validationResult.Errors.Select(e => e.ErrorMessage)
+                            .ToList());
+                }
+
+                if (_unitOfWork.Sports.Exist(entidad))
+                {
+                    return Result.Failure(
+                        $" Ya existe un deporte con el nombre {entidad.SportName}");
+                }
+
+                _unitOfWork.Sports.Update(entidad, sportDto.SportId, sportDto.RowVersion);
+
                 _unitOfWork.Save();
+
                 return Result.Success();
+            }
+            catch (DbUpdateConcurrencyException)//acá decía DBConcurrencyException!!!
+            {
+                _unitOfWork.RollBack();
+
+                return Result.ConcurrencyFailure(
+                    "Otro usuario modificó el registro.\nLa grilla se recargará automáticamente");
+            }
+            catch (KeyNotFoundException)
+            {
+                _unitOfWork.RollBack();
+
+                return Result.Failure(
+                    $"Deporte con ID {sportDto.SportId} no encontrado");
             }
             catch (Exception ex)
             {
-                return Result.Failure(ex.Message);
+                _unitOfWork.RollBack();
+
+                return Result.Failure(
+                    $"Error al intentar editar el deporte: {ex.Message}");
             }
         }
     }
